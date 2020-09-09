@@ -1,102 +1,82 @@
 package com.example.funfacts
 
-import android.graphics.Path
+import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import androidx.room.Room
+import android.view.LayoutInflater
+import android.view.ViewGroup
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.json.JSONArray
+import org.json.JSONObject
+import java.net.URL
 import kotlin.concurrent.thread
 
 class MainActivity : AppCompatActivity() {
+    private lateinit var jsonUrl:String
+    private val TAG=MainActivity::class.java.simpleName
+    private lateinit var adapterE: EmployeeAdapter
 
-    val TAG=MainActivity::class.java.simpleName
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        test()
-        //readQuestion()
-        //只有第一次沒表格，它會產生
-        //所以要更改寫法
-
-//        Thread(
-//            Runnable {
-//
-//
-//            }
-//        ).start()
-
-
-    }
-
-    private fun test() {
-        val db=QuizDatabase.getInstance(this)
-
-        val question= listOf<String>("Bear color","TV Show","Book Type")
-        val answer= listOf<Int>(0,1,2)
-        val option= listOf<Option>(Option("yellow",0), Option("Blue",0),
-            Option("white",0), Option("red",0)
-        )
-        val option1= listOf<Option>(Option("Blue",1), Option("Blue",1),
-            Option("Blue",1), Option("Blue",1))
-
-        val option2=listOf<Option>(Option("white",2), Option("white",2),
-            Option("white",2), Option("white",2))
-        val options= listOf<List<Option>>(option,option1,option2)
-        val optionId= listOf<Long>(0,1,2)
         CoroutineScope(Dispatchers.IO).launch {
-            for (i  in 0 until options.size) {
-                db.quizDao().run {
-                    add(Quiz(question[i], answer[i]))
-                    insertOption(options[i])
-                    getOptionByID(optionId[i])
-                }
-            }
+            jsonUrl = URL("http://dummy.restapiexample.com/api/v1/employees").readText()
+            readEmployee()
+            Log.d(TAG, "onCreate: $jsonUrl")
+            val db=EmployeeDataBase.getInstance(this@MainActivity)
+            val list=db.employeeDao().getData()
             withContext(Dispatchers.Main){
-
-            }
-        }
-//        thread {
-//            runOnUiThread {
-//
-//            }
-//        }
-    }
-
-    private fun readQuestion() {
-
-        val data=resources.openRawResource(R.raw.questions).bufferedReader().readText()
-        val question=JSONArray(data)
-        for (i in 0..question.length()-1){
-            val obj=question.getJSONObject(i)
-            val q=obj.getString("question")
-            val a=obj.getInt("answer")
-            val o=obj.getJSONArray("option")
-            val bag= mutableListOf<String>()
-            Log.d(TAG, "readQuestion: $q")
-            for (j in 0..o.length()-1){
-                Log.d(TAG, "readOption: ${o.getString(j)}")
-                bag.add(o.getString(j))
-            }
-            CoroutineScope(Dispatchers.IO).launch {
-                QuizDatabase.getInstance(this@MainActivity)
-                    .quizDao().apply {
-                        val quizID=add(Quiz("bear",0))
-                    }
-                withContext(Dispatchers.Main){
-
+                adapterE=EmployeeAdapter(list)
+                recycle_employee.run {
+                    setHasFixedSize(true)
+                    layoutManager=LinearLayoutManager(this@MainActivity)
+                    adapter=adapterE
                 }
             }
-            thread {
-                val db=QuizDatabase.getInstance(this)
-                val id=db.quizDao().add(Quiz(q,a))
-            }
-
-        Log.d(TAG, "readAnswer : $a")
         }
     }
+
+    private fun readEmployee() {
+        val db=EmployeeDataBase.getInstance(this)
+
+        val json = JSONObject(jsonUrl)
+        val data = json.getJSONArray("data")
+        val dataList= mutableListOf<Employee>()
+        for (i in 0 until data.length()) {
+                val obj = data.getJSONObject(i)
+                val name = obj.getString("employee_name")
+                val salary = obj.getInt("employee_salary")
+                val age = obj.getInt("employee_age")
+                Log.d(TAG, "readEmployee: $name+$salary+$age")
+                dataList.add(Employee(name, salary, age))
+        }
+        db.employeeDao().add(dataList)
+
+    }
+    private class EmployeeAdapter(var dataList: List<Employee>) :RecyclerView.Adapter<EmployeeViewHolder>(){
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EmployeeViewHolder {
+            val view=LayoutInflater.from(parent.context).inflate(R.layout.item_employee,parent,false)
+            return EmployeeViewHolder(view)
+        }
+
+        override fun onBindViewHolder(holder: EmployeeViewHolder, position: Int) {
+
+            holder.name.setText(dataList[position].name)
+            holder.age.setText(dataList[position].age.toString())
+            holder.salary.setText(dataList[position].salary.toString())
+        }
+
+        override fun getItemCount(): Int {
+            return dataList.size
+        }
+
+    }
+
 }
