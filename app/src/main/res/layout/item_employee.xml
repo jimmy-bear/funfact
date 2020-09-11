@@ -9,12 +9,11 @@
         android:id="@+id/tx_item_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
         android:text="Name"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
         app:layout_constraintEnd_toStartOf="@+id/guideline"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintStart_toStartOf="@+id/guideline5"
+        app:layout_constraintTop_toTopOf="@+id/tx_item_id" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline"
@@ -22,7 +21,16 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="132dp"
         android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.35"
+        app:layout_constraintGuide_percent="0.45"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="132dp"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.15"
         app:layout_constraintStart_toStartOf="parent" />
 
     <androidx.constraintlayout.widget.Guideline
@@ -31,7 +39,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="132dp"
         android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.5"
+        app:layout_constraintGuide_percent="0.6"
         app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
@@ -53,4 +61,15 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@+id/guideline2"
         app:layout_constraintTop_toTopOf="@+id/tx_item_age" />
+
+    <TextView
+        android:id="@+id/tx_item_id"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="id"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        app:layout_constraintEnd_toStartOf="@+id/guideline5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -8,4 +8,5 @@ class EmployeeViewHolder(view:View) :RecyclerView.ViewHolder(view){
     var name=view.tx_item_name
     var age=view.tx_item_age
     var salary=view.tx_item_salary
+    var id=view.tx_item_id
 }
